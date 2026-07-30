@@ -4,8 +4,9 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import Link from "next/link";
 import { registerUser } from "@/lib/actions/auth";
+import { RegisterActionState } from "@/types/action-state";
 
-const initialState = { errors: {}, message: null };
+const initialState: RegisterActionState = { errors: {}, message: null };
 
 export default function RegisterPage() {
   const [state, action] = useActionState(registerUser, initialState);

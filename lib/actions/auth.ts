@@ -6,9 +6,10 @@ import { AuthError } from "next-auth";
 import { signIn, signOut } from "@/lib/auth";
 import { registerSchema } from "@/lib/validations/auth";
 import prisma from "../prisma";
+import { RegisterActionState } from "@/types/action-state";
 
 // ── Register ──────────────────────────────────────────────
-export async function registerUser(_: unknown, formData: FormData) {
+export async function registerUser(_: RegisterActionState, formData: FormData) {
   const raw = {
     name: formData.get("name"),
     email: formData.get("email"),
