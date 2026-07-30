@@ -110,7 +110,7 @@ export function WordForm({
       {categories.length > 0 && (
         <Field
           label="Categories"
-          hint="Select one or more"
+          hint="Select one or more (Where you found the word)"
           error={state?.errors?.categoryIds?.[0]}
         >
           <div className="flex flex-wrap gap-2 pt-1">
