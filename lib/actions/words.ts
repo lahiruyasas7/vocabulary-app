@@ -19,8 +19,16 @@ export async function deleteWord(wordId: string) {
   });
 
   if (!word) return { error: "Word not found." };
+  try {
+    await prisma.word.delete({ where: { id: wordId } });
+  } catch (error) {
+    console.error("Failed to delete word:", error);
 
-  await prisma.word.delete({ where: { id: wordId } });
+    return {
+      message: "Unable to delete the word. Please try again.",
+    };
+  }
+
   revalidatePath("/words");
 }
 
@@ -54,7 +62,15 @@ export async function createWord(_: unknown, formData: FormData) {
 
   const { text, meaning, partOfSpeech, exampleSentence, notes, categoryIds } =
     parsed.data;
+  try {
+  } catch (error) {
+    console.error("Failed to create word:", error);
 
+    return {
+      errors: {},
+      message: "Failed to create the word. Please try again.",
+    };
+  }
   await prisma.word.create({
     data: {
       text: text.trim(),
@@ -104,20 +120,28 @@ export async function updateWord(
 
   const { text, meaning, partOfSpeech, exampleSentence, notes, categoryIds } =
     parsed.data;
-
-  await prisma.word.update({
-    where: { id: wordId },
-    data: {
-      text: text.trim(),
-      meaning: meaning.trim(),
-      partOfSpeech,
-      exampleSentence: exampleSentence?.trim() ?? null,
-      notes: notes?.trim() ?? null,
-      categories: {
-        set: categoryIds?.map((id) => ({ id })) ?? [],
+  try {
+    await prisma.word.update({
+      where: { id: wordId },
+      data: {
+        text: text.trim(),
+        meaning: meaning.trim(),
+        partOfSpeech,
+        exampleSentence: exampleSentence?.trim() ?? null,
+        notes: notes?.trim() ?? null,
+        categories: {
+          set: categoryIds?.map((id) => ({ id })) ?? [],
+        },
       },
-    },
-  });
+    });
+  } catch (error) {
+    console.error("Failed to update word:", error);
+
+    return {
+      errors: {},
+      message: "Failed to update the word. Please try again.",
+    };
+  }
 
   revalidatePath("/words");
   redirect("/words");
