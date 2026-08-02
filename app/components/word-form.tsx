@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 const PARTS_OF_SPEECH = [
@@ -15,13 +15,12 @@ const PARTS_OF_SPEECH = [
   { label: "Interjection", value: "INTERJECTION" },
 ];
 
-// Matches what createWord / updateWord server actions return
 interface FormState {
   errors?: {
     text?: string[];
     meaning?: string[];
     partOfSpeech?: string[];
-    exampleSentence?: string[];
+    exampleSentences?: string[];
     notes?: string[];
     categoryIds?: string[];
   };
@@ -35,7 +34,7 @@ interface WordFormProps {
     text?: string;
     meaning?: string;
     partOfSpeech?: string;
-    exampleSentence?: string | null;
+    exampleSentences?: string[];
     notes?: string | null;
     categoryIds?: string[];
   };
@@ -50,9 +49,28 @@ export function WordForm({
 }: WordFormProps) {
   const [state, formAction] = useActionState(action, undefined);
 
+  // Controlled state for dynamic sentence inputs
+  const [sentences, setSentences] = useState<string[]>(
+    defaultValues?.exampleSentences?.length
+      ? defaultValues.exampleSentences
+      : [""], // start with one empty input
+  );
+
+  function addSentence() {
+    if (sentences.length >= 10) return;
+    setSentences((prev) => [...prev, ""]);
+  }
+
+  function removeSentence(index: number) {
+    setSentences((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function updateSentence(index: number, value: string) {
+    setSentences((prev) => prev.map((s, i) => (i === index ? value : s)));
+  }
+
   return (
     <form action={formAction} className="space-y-5">
-      {/* Global error */}
       {state?.message && (
         <div className="p-3 rounded-lg bg-red-50 border border-red-100">
           <p className="text-sm text-red-600">{state.message}</p>
@@ -106,34 +124,98 @@ export function WordForm({
         </select>
       </Field>
 
-      {/* Categories — multi-select as checkboxes */}
+      {/* Example sentences */}
+      <Field
+        label="Example sentences"
+        hint="Optional · max 10"
+        error={state?.errors?.exampleSentences?.[0]}
+      >
+        <div className="space-y-2">
+          {sentences.map((sentence, index) => (
+            <div key={index} className="flex gap-2 items-start">
+              <textarea
+                name="exampleSentences"
+                value={sentence}
+                onChange={(e) => updateSentence(index, e.target.value)}
+                rows={2}
+                placeholder={`Sentence ${index + 1}...`}
+                className={inputClass(false)}
+              />
+              {sentences.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeSentence(index)}
+                  className="mt-1 w-8 h-8 flex items-center justify-center flex-shrink-0 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                  title="Remove sentence"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
+          ))}
+
+          {sentences.length < 10 && (
+            <button
+              type="button"
+              onClick={addSentence}
+              className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors mt-1"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Add another sentence
+            </button>
+          )}
+        </div>
+      </Field>
+
+      {/* Categories */}
       {categories.length > 0 && (
         <Field
           label="Categories"
-          hint="Select one or more (Where you found the word)"
+          hint="Select one or more"
           error={state?.errors?.categoryIds?.[0]}
         >
           <div className="flex flex-wrap gap-2 pt-1">
-            {categories.map((cat) => {
-              const checked = defaultValues?.categoryIds?.includes(cat.id);
-              return (
-                <label
-                  key={cat.id}
-                  className="flex items-center gap-2 cursor-pointer group"
-                >
-                  <input
-                    type="checkbox"
-                    name="categoryIds"
-                    value={cat.id}
-                    defaultChecked={checked}
-                    className="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900 cursor-pointer"
-                  />
-                  <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
-                    {cat.name}
-                  </span>
-                </label>
-              );
-            })}
+            {categories.map((cat) => (
+              <label
+                key={cat.id}
+                className="flex items-center gap-2 cursor-pointer group"
+              >
+                <input
+                  type="checkbox"
+                  name="categoryIds"
+                  value={cat.id}
+                  defaultChecked={defaultValues?.categoryIds?.includes(cat.id)}
+                  className="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900 cursor-pointer"
+                />
+                <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
+                  {cat.name}
+                </span>
+              </label>
+            ))}
           </div>
         </Field>
       )}
@@ -153,33 +235,17 @@ export function WordForm({
         </div>
       )}
 
-      {/* Example sentence (optional) */}
-      <Field
-        label="Example sentence"
-        hint="Optional"
-        error={state?.errors?.exampleSentence?.[0]}
-      >
-        <textarea
-          name="exampleSentence"
-          rows={2}
-          defaultValue={defaultValues?.exampleSentence ?? ""}
-          placeholder="Use the word in a sentence..."
-          className={inputClass(!!state?.errors?.exampleSentence)}
-        />
-      </Field>
-
-      {/* Notes (optional) */}
+      {/* Notes */}
       <Field label="Notes" hint="Optional" error={state?.errors?.notes?.[0]}>
         <textarea
           name="notes"
           rows={2}
           defaultValue={defaultValues?.notes ?? ""}
-          placeholder="Any additional notes, synonyms, context..."
+          placeholder="Synonyms, context, memory hooks..."
           className={inputClass(!!state?.errors?.notes)}
         />
       </Field>
 
-      {/* Actions */}
       <div className="flex items-center gap-3 pt-2">
         <SubmitButton label={submitLabel} />
         <Link
@@ -192,8 +258,6 @@ export function WordForm({
     </form>
   );
 }
-
-// ── Sub-components ─────────────────────────────────────────
 
 function Field({
   label,
