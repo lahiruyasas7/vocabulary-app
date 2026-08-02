@@ -63,6 +63,10 @@ async function WordsContent({ searchParams }: PageProps) {
         categories: {
           select: { id: true, name: true },
         },
+        exampleSentences: {
+          select: { id: true, text: true, order: true },
+          orderBy: { order: "asc" },
+        },
       },
     }),
     prisma.category.findMany({
