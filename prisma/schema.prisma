@@ -68,7 +68,6 @@ model Word {
   text         String
   meaning      String
   partOfSpeech PartOfSpeech
-  exampleSentence String?
   notes        String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
@@ -76,9 +75,23 @@ model Word {
   userId     String
   user       User       @relation(fields: [userId], references: [id])
   categories Category[] @relation("WordCategories")
+  exampleSentences ExampleSentence[]
 
   @@index([userId])
   @@index([userId, text])
+}
+
+model ExampleSentence {
+  id        String   @id @default(cuid())
+  text      String
+  order     Int      @default(0)  // controls display order
+  createdAt DateTime @default(now())
+
+  wordId String
+  word   Word   @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@index([wordId])
+  @@index([wordId, order])
 }
 
 model Category {
