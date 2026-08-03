@@ -19,6 +19,11 @@ export const wordSchema = z.object({
     .trim()
     .min(1, "Meaning is required")
     .max(1000, "Meaning must be less than 1000 characters"),
+  sinhalaWord: z
+    .string()
+    .trim()
+    .max(500, "Sinhala Word must be less than 500 characters")
+    .optional(),
   partOfSpeech: z.nativeEnum(PartOfSpeech, {
     message: "Please select a part of speech",
   }),
