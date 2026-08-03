@@ -81,6 +81,7 @@ export default async function EditWordPage({ params }: PageProps) {
         defaultValues={{
           text: word.text,
           meaning: word.meaning,
+          sinhalaWord: word.sinhalaWord,
           partOfSpeech: word.partOfSpeech,
           exampleSentences: word.exampleSentences.map((s) => s.text),
           notes: word.notes,
