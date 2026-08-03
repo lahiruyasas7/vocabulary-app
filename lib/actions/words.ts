@@ -18,6 +18,7 @@ function parseWordFormData(formData: FormData) {
   return {
     text: formData.get("text")?.toString().trim(),
     meaning: formData.get("meaning")?.toString().trim(),
+    sinhalaWord: formData.get("sinhalaWord")?.toString().trim(),
     partOfSpeech: formData.get("partOfSpeech")?.toString(),
     notes: formData.get("notes")?.toString().trim() || undefined,
     exampleSentences: rawSentences.length > 0 ? rawSentences : undefined,
@@ -70,13 +71,21 @@ export async function createWord(_: unknown, formData: FormData) {
     return { errors: parsed.error.flatten().fieldErrors };
   }
 
-  const { text, meaning, partOfSpeech, notes, exampleSentences, categoryIds } =
-    parsed.data;
+  const {
+    text,
+    meaning,
+    sinhalaWord,
+    partOfSpeech,
+    notes,
+    exampleSentences,
+    categoryIds,
+  } = parsed.data;
   try {
     await prisma.word.create({
       data: {
         text: text.trim(),
         meaning: meaning.trim(),
+        sinhalaWord: sinhalaWord?.trim(),
         partOfSpeech,
         notes: notes?.trim(),
         userId: session.user.id,
@@ -125,8 +134,15 @@ export async function updateWord(
     return { errors: parsed.error.flatten().fieldErrors };
   }
 
-  const { text, meaning, partOfSpeech, notes, exampleSentences, categoryIds } =
-    parsed.data;
+  const {
+    text,
+    meaning,
+    partOfSpeech,
+    notes,
+    exampleSentences,
+    categoryIds,
+    sinhalaWord,
+  } = parsed.data;
   try {
     await prisma.$transaction([
       // Delete all existing sentences first, then recreate in order
@@ -138,6 +154,7 @@ export async function updateWord(
         data: {
           text: text.trim(),
           meaning: meaning.trim(),
+          sinhalaWord: sinhalaWord?.trim() ?? null,
           partOfSpeech,
           notes: notes?.trim() ?? null,
           categories: {
