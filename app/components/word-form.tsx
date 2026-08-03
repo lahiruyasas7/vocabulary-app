@@ -19,6 +19,7 @@ interface FormState {
   errors?: {
     text?: string[];
     meaning?: string[];
+    sinhalaWord?: string[];
     partOfSpeech?: string[];
     exampleSentences?: string[];
     notes?: string[];
@@ -33,6 +34,7 @@ interface WordFormProps {
   defaultValues?: {
     text?: string;
     meaning?: string;
+    sinhalaWord?: string | null;
     partOfSpeech?: string;
     exampleSentences?: string[];
     notes?: string | null;
@@ -98,6 +100,22 @@ export function WordForm({
           defaultValue={defaultValues?.meaning}
           placeholder="What does it mean?"
           className={inputClass(!!state?.errors?.meaning)}
+        />
+      </Field>
+
+      {/* Sinahala Word */}
+      <Field
+        label="Sinhala Word/ Meaning"
+        hint="Optional"
+        error={state?.errors?.sinhalaWord?.[0]}
+      >
+        <textarea
+          name="sinhalaWord"
+          required
+          rows={3}
+          defaultValue={defaultValues?.sinhalaWord ?? ""}
+          placeholder="What does it Sinhala mean?"
+          className={inputClass(!!state?.errors?.sinhalaWord)}
         />
       </Field>
 
