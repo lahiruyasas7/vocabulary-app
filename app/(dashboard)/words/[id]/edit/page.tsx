@@ -25,6 +25,10 @@ export default async function EditWordPage({ params }: PageProps) {
       where: { id, userId: session.user.id },
       include: {
         categories: { select: { id: true, name: true } },
+        exampleSentences: {
+          select: { id: true, text: true, order: true },
+          orderBy: { order: "asc" },
+        },
       },
     }),
     prisma.category.findMany({
@@ -78,7 +82,7 @@ export default async function EditWordPage({ params }: PageProps) {
           text: word.text,
           meaning: word.meaning,
           partOfSpeech: word.partOfSpeech,
-          exampleSentence: word.exampleSentence,
+          exampleSentences: word.exampleSentences.map((s) => s.text),
           notes: word.notes,
           categoryIds: word.categories.map((c) => c.id),
         }}
