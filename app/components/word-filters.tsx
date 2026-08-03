@@ -1,7 +1,13 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback, useTransition } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  useTransition,
+} from "react";
+import { useDebounce } from "../hooks/use-debounce";
 
 const PARTS_OF_SPEECH = [
   { label: "All", value: "" },
@@ -26,10 +32,14 @@ interface WordFiltersProps {
   totalCount: number;
 }
 
-export function WordFilters({ categories, totalCount }: WordFiltersProps) {
+export function WordFilters({
+  categories,
+  totalCount,
+}: WordFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
   const [isPending, startTransition] = useTransition();
 
   const currentSort = searchParams.get("sort") ?? "date";
@@ -37,26 +47,58 @@ export function WordFilters({ categories, totalCount }: WordFiltersProps) {
   const currentCategory = searchParams.get("category") ?? "";
   const currentSearch = searchParams.get("q") ?? "";
 
+  const [search, setSearch] = useState(currentSearch);
+  const debouncedSearch = useDebounce(search, 300);
+
+  // Keep the input synced with the URL.
+  useEffect(() => {
+    setSearch(currentSearch);
+  }, [currentSearch]);
+
   const updateParam = useCallback(
     (key: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString());
+
       if (value) {
         params.set(key, value);
       } else {
         params.delete(key);
       }
-      // Reset to page 1 on filter change
+
+      // Reset pagination when filters change.
       params.delete("page");
+
+      const nextUrl = `${pathname}?${params.toString()}`;
+      const currentUrl = `${pathname}?${searchParams.toString()}`;
+
+      // Avoid unnecessary navigations.
+      if (nextUrl === currentUrl) {
+        return;
+      }
+
       startTransition(() => {
-        router.push(`${pathname}?${params.toString()}`);
+        router.push(nextUrl);
       });
     },
-    [searchParams, pathname, router]
+    [pathname, router, searchParams]
   );
 
+  // Update the URL only after the user stops typing.
+  useEffect(() => {
+    if (debouncedSearch === currentSearch) {
+      return;
+    }
+
+    updateParam("q", debouncedSearch);
+  }, [debouncedSearch, currentSearch, updateParam]);
+
   return (
-    <div className={`space-y-3 ${isPending ? "opacity-60 pointer-events-none" : ""} transition-opacity`}>
-      {/* Search + Sort row */}
+    <div
+      className={`space-y-3 ${
+        isPending ? "opacity-60 pointer-events-none" : ""
+      } transition-opacity`}
+    >
+      {/* Search + Sort */}
       <div className="flex gap-2">
         <div className="relative flex-1">
           <svg
@@ -72,22 +114,24 @@ export function WordFilters({ categories, totalCount }: WordFiltersProps) {
               d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
             />
           </svg>
+
           <input
             type="text"
             placeholder="Search words..."
-            defaultValue={currentSearch}
-            onChange={(e) => updateParam("q", e.target.value)}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white"
           />
         </div>
+
         <select
           value={currentSort}
           onChange={(e) => updateParam("sort", e.target.value)}
           className="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 min-w-[130px]"
         >
-          {SORT_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
+          {SORT_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
             </option>
           ))}
         </select>
@@ -123,6 +167,7 @@ export function WordFilters({ categories, totalCount }: WordFiltersProps) {
           >
             All categories
           </button>
+
           {categories.map((cat) => (
             <button
               key={cat.id}

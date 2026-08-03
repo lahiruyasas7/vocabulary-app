@@ -32,7 +32,7 @@ interface WordCardProps {
     text: string;
     meaning: string;
     partOfSpeech: string;
-    exampleSentence: string | null;
+    exampleSentences: { id: string; text: string; order: number }[];
     notes: string | null;
     createdAt: Date;
     categories: { id: string; name: string }[];
@@ -78,10 +78,19 @@ export function WordCard({ word }: WordCardProps) {
           {word.meaning}
         </p>
 
-        {word.exampleSentence && (
-          <p className="text-xs text-gray-400 italic mb-2 leading-relaxed">
-            &ldquo;{word.exampleSentence}&rdquo;
-          </p>
+        {word.exampleSentences.length > 0 && (
+          <div className="space-y-1 mb-2">
+            {word.exampleSentences
+              .sort((a, b) => a.order - b.order)
+              .map((s) => (
+                <p
+                  key={s.id}
+                  className="text-xs text-gray-400 italic leading-relaxed"
+                >
+                  &ldquo;{s.text}&rdquo;
+                </p>
+              ))}
+          </div>
         )}
 
         {word.notes && (
