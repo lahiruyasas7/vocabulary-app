@@ -67,6 +67,7 @@ model Word {
   id           String       @id @default(cuid())
   text         String
   meaning      String
+  sinhalaWord  String?
   partOfSpeech PartOfSpeech
   notes        String?
   createdAt    DateTime     @default(now())
