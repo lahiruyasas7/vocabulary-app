@@ -199,13 +199,17 @@ export function WordDetailModal({ word, onClose }: WordDetailModalProps) {
             </section>
           )}
 
-            {/* Sinahala Meaning */}
-          <section>
-            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
-              Sinahala Word/Meaning
-            </h3>
-            <p className="text-gray-800 leading-relaxed">{word.sinhalaWord}</p>
-          </section>
+          {/* Sinahala Meaning */}
+          {word.sinhalaWord && (
+            <section>
+              <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                Sinahala Word/Meaning
+              </h3>
+              <p className="text-gray-800 leading-relaxed">
+                {word.sinhalaWord}
+              </p>
+            </section>
+          )}
 
           {/* Meta */}
           <p className="text-xs text-gray-400 pt-1">Added on {formattedDate}</p>
