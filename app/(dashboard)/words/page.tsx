@@ -1,9 +1,9 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { WordCard } from "@/app/components/word-card";
 import { WordFilters } from "@/app/components/word-filters";
 import { EmptyState } from "@/app/components/empty-state";
+import { WordList } from "@/app/components/word-list";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { PartOfSpeech } from "@/app/generated/prisma/enums";
@@ -24,12 +24,10 @@ async function WordsContent({ searchParams }: PageProps) {
   const { q, sort, pos, category } = await searchParams;
   const userId = session.user.id;
 
-  // Validate partOfSpeech enum value
   const validPos = Object.values(PartOfSpeech).includes(pos as PartOfSpeech)
     ? (pos as PartOfSpeech)
     : undefined;
 
-  // Build Prisma where clause
   const where = {
     userId,
     ...(q && {
@@ -46,23 +44,19 @@ async function WordsContent({ searchParams }: PageProps) {
     }),
   };
 
-  // Build orderBy
   const orderBy =
     sort === "asc"
       ? { text: "asc" as const }
       : sort === "desc"
         ? { text: "desc" as const }
-        : { createdAt: "desc" as const }; // default: newest first
+        : { createdAt: "desc" as const };
 
-  // Fetch words + categories in parallel
   const [words, categories, totalCount] = await Promise.all([
     prisma.word.findMany({
       where,
       orderBy,
       include: {
-        categories: {
-          select: { id: true, name: true },
-        },
+        categories: { select: { id: true, name: true } },
         exampleSentences: {
           select: { id: true, text: true, order: true },
           orderBy: { order: "asc" },
@@ -81,11 +75,8 @@ async function WordsContent({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-6">
-      {/* Page header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-medium text-gray-900">My words</h1>
-        </div>
+        <h1 className="text-xl font-medium text-gray-900">My words</h1>
         <Link
           href="/words/new"
           className="flex items-center gap-1.5 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors"
@@ -107,22 +98,16 @@ async function WordsContent({ searchParams }: PageProps) {
         </Link>
       </div>
 
-      {/* Filters — client component wrapped in Suspense for searchParams */}
       <Suspense
         fallback={<div className="h-24 bg-gray-100 rounded-xl animate-pulse" />}
       >
         <WordFilters categories={categories} totalCount={totalCount} />
       </Suspense>
 
-      {/* Word list */}
       {words.length === 0 ? (
         <EmptyState hasFilters={hasFilters} />
       ) : (
-        <div className="space-y-2">
-          {words.map((word) => (
-            <WordCard key={word.id} word={word} />
-          ))}
-        </div>
+        <WordList words={words} />
       )}
     </div>
   );
@@ -136,7 +121,7 @@ export default function WordsPage(props: PageProps) {
           {[...Array(5)].map((_, i) => (
             <div
               key={i}
-              className="h-24 bg-white border border-gray-100 rounded-xl animate-pulse"
+              className="h-16 bg-white border border-gray-100 rounded-xl animate-pulse"
             />
           ))}
         </div>
