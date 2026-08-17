@@ -8,6 +8,7 @@ type WordWithRelations = {
   id: string;
   text: string;
   meaning: string;
+  sinhalaWord: string | null;
   partOfSpeech: string;
   exampleSentences: { id: string; text: string; order: number }[];
   notes: string | null;
