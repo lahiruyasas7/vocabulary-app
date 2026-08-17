@@ -99,7 +99,7 @@ export function WordDetailModal({ word, onClose }: WordDetailModalProps) {
   return (
     <dialog
       ref={dialogRef}
-      className="sm:max-w-lg sm:mx-auto sm:my-8 m-4 w-auto sm:w-full rounded-2xl shadow-2xl"
+      className="sm:max-w-lg sm:mx-auto sm:my-8 m-4 sm:w-full rounded-2xl shadow-2xl md:max-w-240 w-full"
     >
       <div className="bg-white rounded-2xl max-h-[85dvh] flex flex-col">
         {/* Header */}
