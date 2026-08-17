@@ -12,6 +12,7 @@ interface WordDetailModalProps {
     id: string;
     text: string;
     meaning: string;
+    sinhalaWord: string | null;
     partOfSpeech: string;
     exampleSentences: { id: string; text: string; order: number }[];
     notes: string | null;
@@ -197,6 +198,14 @@ export function WordDetailModal({ word, onClose }: WordDetailModalProps) {
               </div>
             </section>
           )}
+
+            {/* Sinahala Meaning */}
+          <section>
+            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+              Sinahala Word/Meaning
+            </h3>
+            <p className="text-gray-800 leading-relaxed">{word.sinhalaWord}</p>
+          </section>
 
           {/* Meta */}
           <p className="text-xs text-gray-400 pt-1">Added on {formattedDate}</p>
