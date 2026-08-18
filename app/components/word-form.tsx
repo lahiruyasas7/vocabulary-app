@@ -111,7 +111,6 @@ export function WordForm({
       >
         <textarea
           name="sinhalaWord"
-          required
           rows={3}
           defaultValue={defaultValues?.sinhalaWord ?? ""}
           placeholder="What does it Sinhala mean?"
