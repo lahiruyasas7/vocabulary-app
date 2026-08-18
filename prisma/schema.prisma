@@ -25,6 +25,7 @@ model User {
   sessions  Session[]
   words      Word[]
   categories Category[]
+  phrases    Phrase[]
 }
 
 model Account {
@@ -95,6 +96,39 @@ model ExampleSentence {
   @@index([wordId, order])
 }
 
+model Phrase {
+  id           String       @id @default(cuid())
+  text         String
+  meaning      String
+  sinhalaPhrase String?
+  phraseType   PhraseType?
+  register     Register?
+  notes        String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  userId     String
+  user       User       @relation(fields: [userId], references: [id])
+  categories Category[] @relation("PhraseCategories")
+  exampleSentences PhraseExampleSentence[]
+
+  @@index([userId])
+  @@index([userId, text])
+}
+
+model PhraseExampleSentence {
+  id        String   @id @default(cuid())
+  text      String
+  order     Int      @default(0)  // controls display order
+  createdAt DateTime @default(now())
+
+  phraseId String
+  phrase   Phrase   @relation(fields: [phraseId], references: [id], onDelete: Cascade)
+
+  @@index([phraseId])
+  @@index([phraseId, order])
+}
+
 model Category {
   id        String   @id @default(cuid())
   name      String
@@ -103,6 +137,7 @@ model Category {
   userId String
   user   User   @relation(fields: [userId], references: [id])
   words  Word[] @relation("WordCategories")
+  phrases Phrase[] @relation("PhraseCategories")
 
   @@unique([userId, name])
 }
@@ -116,4 +151,20 @@ enum PartOfSpeech {
   PREPOSITION
   CONJUNCTION
   INTERJECTION
+}
+
+enum PhraseType {
+  IDIOM
+  PHRASAL_VERB
+  COLLOCATION
+  PROVERB
+  EXPRESSION        // fixed expressions, greetings, sayings
+  CLAUSE
+}
+
+enum Register {
+  FORMAL
+  INFORMAL
+  SLANG
+  NEUTRAL
 }
