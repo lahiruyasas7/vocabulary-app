@@ -25,7 +25,6 @@ interface FormState {
     text?: string[];
     meaning?: string[];
     sinhalaPhrase?: string[];
-    partOfSpeech?: string[];
     phraseType?: string[];
     register?: string[];
     exampleSentences?: string[];
@@ -42,7 +41,6 @@ interface PhraseFormProps {
     text?: string;
     meaning?: string;
     sinhalaPhrase?: string | null;
-    partOfSpeech?: string | null;
     phraseType?: string;
     register?: string;
     exampleSentences?: string[];
@@ -125,32 +123,6 @@ export function PhraseForm({
           placeholder="What does it mean in Sinhala?"
           className={inputClass(!!state?.errors?.sinhalaPhrase)}
         />
-      </Field>
-
-      {/* Part of speech (optional) */}
-      <Field
-        label="Part of speech"
-        hint="Optional"
-        error={state?.errors?.partOfSpeech?.[0]}
-      >
-        <select
-          name="partOfSpeech"
-          defaultValue={defaultValues?.partOfSpeech ?? ""}
-          className={inputClass(!!state?.errors?.partOfSpeech)}
-        >
-          <option value="" disabled>
-            Select...
-          </option>
-          {/* Reuse the same POS options as words */}
-          <option value="NOUN">Noun</option>
-          <option value="VERB">Verb</option>
-          <option value="ADJECTIVE">Adjective</option>
-          <option value="ADVERB">Adverb</option>
-          <option value="PRONOUN">Pronoun</option>
-          <option value="PREPOSITION">Preposition</option>
-          <option value="CONJUNCTION">Conjunction</option>
-          <option value="INTERJECTION">Interjection</option>
-        </select>
       </Field>
 
       {/* Phrase type */}
