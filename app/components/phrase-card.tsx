@@ -1,6 +1,11 @@
 "use client";
 
-import { PHRASE_TYPE_LABELS, PHRASE_TYPE_STYLES, REGISTER_LABELS, REGISTER_STYLES } from "../types/phrases.type";
+import {
+  PHRASE_TYPE_LABELS,
+  PHRASE_TYPE_STYLES,
+  REGISTER_LABELS,
+  REGISTER_STYLES,
+} from "../types/phrases.type";
 
 interface PhraseCardProps {
   phrase: {
@@ -30,23 +35,15 @@ export function PhraseCard({ phrase, onClick }: PhraseCardProps) {
           {phrase.text}
         </span>
         <div className="flex flex-wrap gap-2">
-          {phrase.partOfSpeech && (
-            <span
-              className={`text-[11px] px-2 py-0.5 rounded-full font-semibold tracking-wide uppercase shrink-0 ${
-                // We don't have POS_STYLES for phrases since they might not always have POS
-                "bg-gray-100 text-gray-600"
-              }`}
-            >
-              {phrase.partOfSpeech.toLowerCase()}
-            </span>
-          )}
           {phrase.phraseType && (
             <span
               className={`text-[11px] px-2 py-0.5 rounded-full font-semibold tracking-wide uppercase shrink-0 ${
-                PHRASE_TYPE_STYLES[phrase.phraseType] ?? "bg-gray-100 text-gray-600"
+                PHRASE_TYPE_STYLES[phrase.phraseType] ??
+                "bg-gray-100 text-gray-600"
               }`}
             >
-              {PHRASE_TYPE_LABELS[phrase.phraseType] ?? phrase.phraseType.toLowerCase()}
+              {PHRASE_TYPE_LABELS[phrase.phraseType] ??
+                phrase.phraseType.toLowerCase()}
             </span>
           )}
           {phrase.register && (
@@ -55,7 +52,8 @@ export function PhraseCard({ phrase, onClick }: PhraseCardProps) {
                 REGISTER_STYLES[phrase.register] ?? "bg-gray-100 text-gray-600"
               }`}
             >
-              {REGISTER_LABELS[phrase.register] ?? phrase.register.toLowerCase()}
+              {REGISTER_LABELS[phrase.register] ??
+                phrase.register.toLowerCase()}
             </span>
           )}
         </div>

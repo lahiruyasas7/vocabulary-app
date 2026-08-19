@@ -19,7 +19,6 @@ interface PhraseDetailModalProps {
     text: string;
     meaning: string;
     sinhalaPhrase: string | null;
-    partOfSpeech: string | null;
     phraseType: string | null;
     register: string | null;
     exampleSentences: { id: string; text: string; order: number }[];
@@ -130,16 +129,6 @@ export function PhraseDetailModal({ phrase, onClose }: PhraseDetailModalProps) {
                 {phrase.text}
               </h2>
               <div className="flex flex-wrap gap-2">
-                {phrase.partOfSpeech && (
-                  <span
-                    className={`text-[11px] px-2 py-0.5 rounded-full font-semibold tracking-wide uppercase shrink-0 ${
-                      // We don't have specific POS styles for phrases, so use a neutral style
-                      "bg-gray-100 text-gray-600"
-                    }`}
-                  >
-                    {phrase.partOfSpeech.toLowerCase()}
-                  </span>
-                )}
                 {phrase.phraseType && (
                   <span
                     className={`text-[11px] px-2 py-0.5 rounded-full font-semibold tracking-wide uppercase shrink-0 ${
