@@ -14,6 +14,7 @@ type PhraseWithRelations = {
   exampleSentences: { id: string; text: string; order: number }[];
   notes: string | null;
   createdAt: Date;
+  categories: { id: string; name: string }[];
 };
 
 interface PhraseListProps {
@@ -39,7 +40,9 @@ export function PhraseList({ phrases }: PhraseListProps) {
         ))}
       </div>
 
-      <PhraseDetailModal phrase={selectedPhrase} onClose={handleClose} />
+      {selectedPhrase && (
+        <PhraseDetailModal phrase={selectedPhrase} onClose={handleClose} />
+      )}
     </>
   );
 }
