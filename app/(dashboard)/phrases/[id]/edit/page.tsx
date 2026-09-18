@@ -82,7 +82,6 @@ export default async function EditPhrasePage({ params }: PageProps) {
           text: phrase.text,
           meaning: phrase.meaning,
           sinhalaPhrase: phrase.sinhalaPhrase,
-          partOfSpeech: phrase.partOfSpeech,
           phraseType: phrase.phraseType,
           register: phrase.register,
           exampleSentences: phrase.exampleSentences.map((s) => s.text),
