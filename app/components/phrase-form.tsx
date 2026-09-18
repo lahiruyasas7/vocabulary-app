@@ -41,8 +41,8 @@ interface PhraseFormProps {
     text?: string;
     meaning?: string;
     sinhalaPhrase?: string | null;
-    phraseType?: string;
-    register?: string;
+    phraseType?: string | null;
+    register?: string | null; 
     exampleSentences?: string[];
     notes?: string | null;
     categoryIds?: string[];
